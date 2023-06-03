@@ -1,5 +1,5 @@
 //introducing the variables 
-var jet, jet_flying, jet_sound, sky, sky_moving, points, ammunition, prshield, restartsp, restartImg, jet_stop;
+var jet, jet_flying, jet_sound, sky, sky_moving, points, ammunition, prshield, restartsp, restartImg, jet_stop, chkpointstarImg, chkptstar;
 var fighterh, fighterv, fitrh1, fitrh2, fitrh3, fitrv4, fitrv5, fitrv6, ftrh, ftrv, randst, clouds_grp, fighterh_grp, fighterv_grp, gameoverImage, gameover;
 var jet_move, jet_crash, jet_chkpoint, jet_stars, createammo, createshld, ammo_grp, shld_grp, ammun; 
 var rand_clouds, cloud, cloud_running, sky_inv;
@@ -35,6 +35,7 @@ function preload(){
   
   gameoverImage = loadImage ("crashimg.png");
   restartImg = loadImage ("restart.png");
+  chkpointstarImg = loadImage ("5starpoints.png");
 }
 
 //creating the canvas, jet and sky sprites for the setup
@@ -52,7 +53,7 @@ function setup() {
   sky = createSprite(width/2,height/2,width,height*6);
   sky.addImage ("SKYMOVING", sky_moving);
   sky.scale = 1.5;
-  sky.velocityY = 3;
+  sky.velocityY = 15;
    sky_inv.visible = false; 
  
   //create a jet sprite
@@ -77,7 +78,10 @@ function setup() {
   restartsp = createSprite (width/2,(height/2)+ 90, 200, 55);
   restartsp.addImage (restartImg);
   restartsp.scale = 0.35;
-    
+  chkptstar = createSprite (width/2,(height/2)+ 80, 250, 55);
+  chkptstar.addImage (chkpointstarImg);
+  chkptstar.scale = 0.8;
+   
     }
 
 function draw(){
@@ -119,22 +123,30 @@ function draw(){
         jet_move.play();
         touches = [];
       }  
-    
-    
+      chkptstar.visible = false; 
+
    // adding the points according to the framecounts covered
       points = points + Math.round(frameCount/100);
 
     if ((points % 200 === 0) && (points > 0))
     {
       jet_chkpoint.play() ; 
+      chkptstar.visible = true;
+      chkptstar.depth = jet.depth;
+      chkptstar.depth = chkptstar.depth + 1;
+      chkptstar.lifetime = 200;
+     // chkptstar.destroy();
+            
     }
     gameover.visible = false;
    restartsp.visible = false;
    
-   sky.velocityY = (4 + 2 * (points/200));
+   //increasing the sky speed as the points increase
+   sky.velocityY = (4 + 3 * (points/200));
    
-   if (sky.y > 230) {
-     sky.y = sky.height/2;
+   //code to reset the sky as it goes down
+   if (sky.y > 500) {
+     sky.y = height/2;
        } 
       
        jet.collide (sky_inv);
@@ -184,19 +196,25 @@ function draw(){
     shld_grp.setLifetimeEach(-1);
                                                                                                                                                                                                                                                                                                                                         
         
-    if (mousePressedOver (restartsp))
+  /*  if (mousePressedOver (restartsp))
     {
       restartgm();
-    }
+    } */
+    if (keyDown ("space") || (touches.length >0))
+     {
+       //restarting the game changing gamestate on pressing space key
+       restartgm();
+       touches = [];
+      }  
    }
   }
 
  function rand_clouds() 
 {
-if (frameCount % 120 === 0) 
+if (frameCount % 70 === 0) 
 {
   cloud = createSprite (width/2, 10, 60, 20);
-  cloud.scale = 0.9;
+  cloud.scale = 0.8;
   cloud.velocityY  = 9;
   
   cloud.x = Math.round(random(25,width-20));
